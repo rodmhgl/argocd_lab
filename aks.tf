@@ -9,7 +9,7 @@ module "private" {
   resource_group_name        = azurerm_resource_group.this.name
   location                   = azurerm_resource_group.this.location
   sku_tier                   = "Standard"
-  private_cluster_enabled    = true
+  private_cluster_enabled    = false
   private_dns_zone_id        = module.aks_private_dns_zone.resource_id
   dns_prefix_private_cluster = random_string.dns_prefix.result
 
