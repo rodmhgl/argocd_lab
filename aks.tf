@@ -27,10 +27,6 @@ resource "azurerm_federated_identity_credential" "this" {
   subject             = "system:serviceaccount:cert-manager:cert-manager"
 }
 
-output "clientID" {
-  value = azurerm_user_assigned_identity.this.client_id
-}
-
 resource "azurerm_role_assignment" "dns_zone_contributor" {
   provider = azurerm.dns
 
@@ -58,14 +54,6 @@ resource "azurerm_role_assignment" "aks_admin" {
   principal_id         = data.azurerm_client_config.current.object_id
   scope                = azurerm_resource_group.this.id
   role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
-}
-
-resource "random_string" "dns_prefix" {
-  length  = 10    # Set the length of the string
-  lower   = true  # Use lowercase letters
-  numeric = true  # Include numbers
-  special = false # No special characters
-  upper   = false # No uppercase letters
 }
 
 #region management_aks
@@ -112,7 +100,7 @@ module "management_aks" {
     max_count                    = 3
     max_pods                     = 30
     min_count                    = 1
-    vnet_subnet_id               = azurerm_subnet.subnet.id
+    vnet_subnet_id               = module.vnet.aks_subnet_id
     temporary_name_for_rotation  = "tmppool"
     only_critical_addons_enabled = false
 
@@ -156,7 +144,7 @@ module "management_aks" {
 
 resource "azurerm_role_assignment" "mgmt_network_contributor" {
   principal_id         = module.management_aks.kubelet_identity_id
-  scope                = azurerm_virtual_network.vnet.id
+  scope                = module.vnet.id
   role_definition_name = "Network Contributor"
 }
 #endregion
@@ -205,7 +193,7 @@ module "dev_aks" {
     max_count                    = 3
     max_pods                     = 30
     min_count                    = 1
-    vnet_subnet_id               = azurerm_subnet.subnet.id
+    vnet_subnet_id               = module.vnet.aks_subnet_id
     temporary_name_for_rotation  = "tmppool"
     only_critical_addons_enabled = false
 
@@ -222,7 +210,7 @@ resource "azurerm_role_assignment" "dev_network_contributor" {
   count = var.enabled_dev_aks ? 1 : 0
 
   principal_id         = module.dev_aks[0].kubelet_identity_id
-  scope                = azurerm_virtual_network.vnet.id
+  scope                = module.vnet.id
   role_definition_name = "Network Contributor"
 }
 #endregion
@@ -271,7 +259,7 @@ module "prod_aks" {
     max_count                    = 3
     max_pods                     = 30
     min_count                    = 1
-    vnet_subnet_id               = azurerm_subnet.subnet.id
+    vnet_subnet_id               = module.vnet.aks_subnet_id
     temporary_name_for_rotation  = "tmppool"
     only_critical_addons_enabled = false
 
@@ -289,7 +277,7 @@ resource "azurerm_role_assignment" "prod_network_contributor" {
   count = var.enabled_prod_aks ? 1 : 0
 
   principal_id         = module.prod_aks[0].kubelet_identity_id
-  scope                = azurerm_virtual_network.vnet.id
+  scope                = module.vnet.id
   role_definition_name = "Network Contributor"
 }
 #endregion

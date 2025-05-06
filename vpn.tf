@@ -5,7 +5,7 @@ resource "azurerm_subnet" "gateway_subnet" {
   address_prefixes     = ["10.1.100.0/27"]
   name                 = "GatewaySubnet"
   resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
+  virtual_network_name = module.vnet.virtual_network_name
 }
 
 resource "azurerm_public_ip" "this" {

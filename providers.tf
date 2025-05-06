@@ -43,7 +43,7 @@ module "aks_private_dns_zone" {
   virtual_network_links = {
     vnet_link = {
       vnetlinkname     = "privatelink-${azurerm_resource_group.this.location}-azmk8s-io"
-      vnetid           = azurerm_virtual_network.vnet.id
+      vnetid           = module.vnet.id
       autoregistration = false
       tags             = {}
     }
