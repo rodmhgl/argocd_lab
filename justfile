@@ -8,6 +8,12 @@ plan_name := "tfplan"
 default:
   @just --list
 
+# Run infracost
+infracost:
+  @echo "Running infracost"
+  infracost breakdown --path={{working_directory}} # --format json --out-file infracost.json
+  @echo "Infracost completed"
+
 # Run terraform init
 init:
   @echo "Running terraform init"
