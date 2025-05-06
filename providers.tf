@@ -26,6 +26,9 @@ module "naming" {
 resource "azurerm_resource_group" "this" {
   location = "eastus"
   name     = module.naming.resource_group.name_unique
+  tags = {
+    "hidden-title" = "Argo CD Demo Lab"
+  }
 }
 #endregion
 
