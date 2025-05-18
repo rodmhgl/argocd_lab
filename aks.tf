@@ -165,6 +165,8 @@ module "dev_aks" {
   private_cluster_enabled    = false
   private_dns_zone_id        = module.aks_private_dns_zone.resource_id
   dns_prefix_private_cluster = random_string.dns_prefix.result
+  oidc_issuer_enabled        = true
+  workload_identity_enabled  = true
 
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled     = true
@@ -231,6 +233,8 @@ module "prod_aks" {
   private_cluster_enabled    = false
   private_dns_zone_id        = module.aks_private_dns_zone.resource_id
   dns_prefix_private_cluster = random_string.dns_prefix.result
+  oidc_issuer_enabled        = true
+  workload_identity_enabled  = true
 
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled     = true
@@ -279,5 +283,16 @@ resource "azurerm_role_assignment" "prod_network_contributor" {
   principal_id         = module.prod_aks[0].kubelet_identity_id
   scope                = module.vnet.id
   role_definition_name = "Network Contributor"
+}
+
+resource "azurerm_federated_identity_credential" "prod_federation" {
+  count = var.enabled_prod_aks ? 1 : 0
+
+  name                = "cert-manager-prod"
+  resource_group_name = azurerm_resource_group.this.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = module.prod_aks[0].oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.this.id
+  subject             = "system:serviceaccount:cert-manager:aks-j9sg-prod-cert-manager"
 }
 #endregion
