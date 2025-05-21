@@ -30,3 +30,18 @@ variable "enabled_dev_aks" {
   type        = bool
   default     = false
 }
+
+variable "managed_subscription_ids" {
+  description = "List of subscription IDs to manage"
+  type        = list(string)
+}
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default = {
+    AutoPowerMgmt = "Enabled"
+    Environment   = "Lab"
+    Purpose       = "ArgoCD"
+  }
+}

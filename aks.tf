@@ -63,7 +63,7 @@ module "management_aks" {
 
   depends_on = [azurerm_role_assignment.private_dns_zone_contributor]
 
-  name                       = module.naming.kubernetes_cluster.name_unique
+  name                       = "${module.naming.kubernetes_cluster.name_unique}-mgmt"
   resource_group_name        = azurerm_resource_group.this.name
   location                   = azurerm_resource_group.this.location
   sku_tier                   = "Free"
@@ -72,6 +72,7 @@ module "management_aks" {
   dns_prefix_private_cluster = random_string.dns_prefix.result
   oidc_issuer_enabled        = true
   workload_identity_enabled  = true
+  tags                       = var.tags
 
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled     = true
@@ -167,6 +168,7 @@ module "dev_aks" {
   dns_prefix_private_cluster = random_string.dns_prefix.result
   oidc_issuer_enabled        = true
   workload_identity_enabled  = true
+  tags                       = var.tags
 
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled     = true
@@ -235,6 +237,7 @@ module "prod_aks" {
   dns_prefix_private_cluster = random_string.dns_prefix.result
   oidc_issuer_enabled        = true
   workload_identity_enabled  = true
+  tags                       = var.tags
 
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled     = true

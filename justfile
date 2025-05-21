@@ -61,3 +61,20 @@ validate: fmt init
   @echo "Running terraform validate"
   @terraform -chdir={{working_directory}} validate
   @echo "Terraform validate completed"
+
+# Start all AKS clusters with specified resource group
+start_all_aks rg:
+  @echo "Starting all AKS clusters across subscriptions"
+  @az automation runbook start --automation-account-name AKS-Lab-Automation --name Start-AKS-Clusters --resource-group {{rg}}
+  @echo "Start job initiated"
+
+# Stop all AKS clusters with specified resource group
+stop_all_aks rg:
+  @echo "Stopping all AKS clusters across subscriptions"
+  @az automation runbook start --automation-account-name AKS-Lab-Automation --name Stop-AKS-Clusters --resource-group {{rg}}
+  @echo "Stop job initiated"
+
+# Check job status
+check_job_status rg:
+  @echo "Checking automation job status"
+  @az automation job list --automation-account-name AKS-Lab-Automation --resource-group {{rg}} --query "[?status=='Running']" -o table
